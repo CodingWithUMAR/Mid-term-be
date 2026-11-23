@@ -1,0 +1,437 @@
+{
+  "info": {
+    "name": "TURBO Store API",
+    "_postman_id": "a77d19c0-4b3c-4c91-9f7e-5eab00112233",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Signup first, verify email OTP, login, then test protected store routes. Uses cookie jar for HttpOnly auth cookie."
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000"
+    },
+    {
+      "key": "email",
+      "value": "your-test-email@example.com"
+    },
+    {
+      "key": "password",
+      "value": "ChangeThisPassword123!"
+    },
+    {
+      "key": "otp",
+      "value": "123456"
+    },
+    {
+      "key": "productId",
+      "value": "REPLACE_WITH_PRODUCT_OBJECT_ID"
+    },
+    {
+      "key": "slug",
+      "value": "turbo-core-oversized-tee"
+    },
+    {
+      "key": "orderId",
+      "value": "REPLACE_WITH_ORDER_OBJECT_ID"
+    },
+    {
+      "key": "newProductSlug",
+      "value": "turbo-postman-sample-product"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/health"
+      }
+    },
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "1 - Signup",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\":\"Postman Tester\",\"email\":\"{{email}}\",\"password\":\"{{password}}\"}"
+            },
+            "url": "{{baseUrl}}/api/auth/signup"
+          }
+        },
+        {
+          "name": "2 - Verify email OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"{{email}}\",\"otp\":\"{{otp}}\"}"
+            },
+            "url": "{{baseUrl}}/api/auth/verify-email"
+          }
+        },
+        {
+          "name": "Resend verification OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"{{email}}\",\"purpose\":\"verify_email\"}"
+            },
+            "url": "{{baseUrl}}/api/auth/resend-otp"
+          }
+        },
+        {
+          "name": "3 - Login (stores cookie in Postman cookie jar)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"{{email}}\",\"password\":\"{{password}}\"}"
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        },
+        {
+          "name": "Forgot password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"{{email}}\"}"
+            },
+            "url": "{{baseUrl}}/api/auth/forgot-password"
+          }
+        },
+        {
+          "name": "Reset password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"{{email}}\",\"otp\":\"{{otp}}\",\"newPassword\":\"NewStrongPassword123!\"}"
+            },
+            "url": "{{baseUrl}}/api/auth/reset-password"
+          }
+        },
+        {
+          "name": "Me (protected)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/auth/me"
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/auth/logout"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "List products",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/store/products"
+          }
+        },
+        {
+          "name": "Filter products by category",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/store/products?category=T-Shirts"
+          }
+        },
+        {
+          "name": "Get product by slug",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/store/products/{{slug}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Protected shopping (login first)",
+      "item": [
+        {
+          "name": "Get cart",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/store/cart"
+          }
+        },
+        {
+          "name": "Add cart item",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"productId\":\"{{productId}}\",\"size\":\"M\",\"color\":\"Jet Black\",\"quantity\":1}"
+            },
+            "url": "{{baseUrl}}/api/store/cart/items"
+          }
+        },
+        {
+          "name": "Merge guest cart",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"items\":[{\"productId\":\"{{productId}}\",\"size\":\"M\",\"color\":\"Jet Black\",\"quantity\":1}]}"
+            },
+            "url": "{{baseUrl}}/api/store/cart/merge"
+          }
+        },
+        {
+          "name": "Checkout COD",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"paymentMethod\":\"cod\",\"shippingAddress\":{\"fullName\":\"Postman Tester\",\"phone\":\"03001234567\",\"addressLine\":\"House 12, Street 4\",\"city\":\"Karachi\",\"province\":\"Sindh\",\"postalCode\":\"75500\"},\"customerNote\":\"Please call before delivery.\"}"
+            },
+            "url": "{{baseUrl}}/api/store/checkout"
+          }
+        },
+        {
+          "name": "My purchase history",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/store/orders"
+          }
+        },
+        {
+          "name": "Update cart item quantity",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"size\":\"M\",\"color\":\"Jet Black\",\"quantity\":2}"
+            },
+            "url": "{{baseUrl}}/api/store/cart/items/{{productId}}"
+          }
+        },
+        {
+          "name": "Remove cart item",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"size\":\"M\",\"color\":\"Jet Black\"}"
+            },
+            "url": "{{baseUrl}}/api/store/cart/items/{{productId}}"
+          }
+        },
+        {
+          "name": "Order details (owner only)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/store/orders/{{orderId}}"
+          }
+        },
+        {
+          "name": "Saved addresses",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/store/addresses"
+          }
+        },
+        {
+          "name": "Save address",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"label\":\"Home\",\"fullName\":\"Postman Tester\",\"phone\":\"03001234567\",\"addressLine\":\"House 12, Street 4\",\"city\":\"Karachi\",\"province\":\"Sindh\",\"postalCode\":\"75500\",\"isDefault\":true}"
+            },
+            "url": "{{baseUrl}}/api/store/addresses"
+          }
+        },
+        {
+          "name": "Cancel my pending/confirmed order",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": "{{baseUrl}}/api/store/orders/{{orderId}}/cancel"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin (admin allowlist required)",
+      "item": [
+        {
+          "name": "List all orders",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/store/admin/orders"
+          }
+        },
+        {
+          "name": "Update order status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"status\":\"confirmed\"}"
+            },
+            "url": "{{baseUrl}}/api/store/admin/orders/{{orderId}}"
+          }
+        },
+        {
+          "name": "Verify bank transfer payment",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"paymentStatus\":\"paid\"}"
+            },
+            "url": "{{baseUrl}}/api/store/admin/orders/{{orderId}}"
+          }
+        },
+        {
+          "name": "Create product",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\":\"Postman Sample Tee\",\"slug\":\"{{newProductSlug}}\",\"description\":\"Sample product created through the admin API.\",\"category\":\"T-Shirts\",\"price\":1990,\"images\":[\"https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=900&q=80\"],\"variants\":[{\"size\":\"M\",\"color\":\"Black\",\"sku\":\"POSTMAN-TEE-M\",\"stock\":5}]}"
+            },
+            "url": "{{baseUrl}}/api/store/admin/products"
+          }
+        },
+        {
+          "name": "Update product",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"price\":2090}"
+            },
+            "url": "{{baseUrl}}/api/store/admin/products/{{productId}}"
+          }
+        },
+        {
+          "name": "Archive product",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/store/admin/products/{{productId}}"
+          }
+        }
+      ]
+    }
+  ]
+}
